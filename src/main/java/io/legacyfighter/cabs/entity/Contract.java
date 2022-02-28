@@ -4,6 +4,7 @@ import io.legacyfighter.cabs.common.BaseEntity;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,77 +41,70 @@ public class Contract extends BaseEntity {
     @Column(nullable = false)
     private String contractNo;
 
+    Contract(String partnerName, String subject, String contractNo) {
+        this.partnerName = partnerName;
+        this.subject = subject;
+        this.contractNo = contractNo;
+    }
+
+    public static Contract from(String partnerName, String subject, int partnerContractsCount) {
+        int createdContractCount = partnerContractsCount + 1;
+        String contractNo = "C/" + createdContractCount + "/" + partnerName;
+        return new Contract(partnerName, subject, contractNo);
+    }
+
+    public void accept() {
+        if (attachments.stream().allMatch(a -> a.getStatus().equals(ContractAttachment.Status.ACCEPTED_BY_BOTH_SIDES))) {
+            status = Status.ACCEPTED;
+        } else {
+            throw new IllegalStateException("Not all attachments accepted by both sides");
+        }
+    }
+
+    public void reject() {
+        status = Status.REJECTED;
+    }
+
+    public ContractAttachment proposeAttachment(byte[] data) {
+        ContractAttachment contractAttachment = ContractAttachment.proposed(data, this);
+        this.attachments.add(contractAttachment);
+        return contractAttachment;
+    }
 
     public Instant getCreationDate() {
         return creationDate;
-    }
-
-    public void setCreationDate(Instant creationDate) {
-        this.creationDate = creationDate;
     }
 
     public Instant getAcceptedAt() {
         return acceptedAt;
     }
 
-    public void setAcceptedAt(Instant acceptedAt) {
-        this.acceptedAt = acceptedAt;
-    }
-
     public Instant getRejectedAt() {
         return rejectedAt;
-    }
-
-    public void setRejectedAt(Instant rejectedAt) {
-        this.rejectedAt = rejectedAt;
     }
 
     public Instant getChangeDate() {
         return changeDate;
     }
 
-    public void setChangeDate(Instant changeDate) {
-        this.changeDate = changeDate;
-    }
-
     public Status getStatus() {
         return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 
     public String getContractNo() {
         return contractNo;
     }
 
-    public void setContractNo(String contractNo) {
-        this.contractNo = contractNo;
-    }
-
     public Set<ContractAttachment> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(Set<ContractAttachment> attachments) {
-        this.attachments = attachments;
+        return Collections.unmodifiableSet(attachments);
     }
 
     public String getPartnerName() {
         return partnerName;
     }
 
-    public void setPartnerName(String partnerName) {
-        this.partnerName = partnerName;
-    }
-
     public String getSubject() {
         return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
     }
 
     @Override

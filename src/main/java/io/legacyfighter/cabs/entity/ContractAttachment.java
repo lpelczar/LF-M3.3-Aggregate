@@ -34,61 +34,54 @@ public class ContractAttachment extends BaseEntity {
     @ManyToOne
     private Contract contract;
 
+    ContractAttachment(byte[] data, Contract contract, Status status) {
+        this.data = data;
+        this.contract = contract;
+        this.status = status;
+    }
+
+    static ContractAttachment proposed(byte[] data, Contract contract) {
+        return new ContractAttachment(data, contract, Status.PROPOSED);
+    }
+
+    public void reject() {
+        status = Status.REJECTED;
+    }
+
+    public void accept() {
+        if (status.equals(Status.ACCEPTED_BY_ONE_SIDE) || status.equals(Status.ACCEPTED_BY_BOTH_SIDES)) {
+            status = Status.ACCEPTED_BY_BOTH_SIDES;
+        } else {
+            status = ContractAttachment.Status.ACCEPTED_BY_ONE_SIDE;
+        }
+    }
 
     public byte[] getData() {
         return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
     }
 
     public Instant getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Instant creationDate) {
-        this.creationDate = creationDate;
-    }
-
     public Instant getAcceptedAt() {
         return acceptedAt;
-    }
-
-    public void setAcceptedAt(Instant acceptedAt) {
-        this.acceptedAt = acceptedAt;
     }
 
     public Instant getRejectedAt() {
         return rejectedAt;
     }
 
-    public void setRejectedAt(Instant rejectedAt) {
-        this.rejectedAt = rejectedAt;
-    }
-
     public Instant getChangeDate() {
         return changeDate;
-    }
-
-    public void setChangeDate(Instant changeDate) {
-        this.changeDate = changeDate;
     }
 
     public Status getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
     public Contract getContract() {
         return contract;
-    }
-
-    public void setContract(Contract contract) {
-        this.contract = contract;
     }
 
     @Override
