@@ -3,10 +3,12 @@ package io.legacyfighter.cabs.dto;
 import io.legacyfighter.cabs.entity.Contract;
 import io.legacyfighter.cabs.entity.Contract.Status;
 import io.legacyfighter.cabs.entity.ContractAttachment;
+import io.legacyfighter.cabs.entity.ContractAttachmentData;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ContractDTO {
 
@@ -33,7 +35,7 @@ public class ContractDTO {
 
     private List<ContractAttachmentDTO> attachments = new ArrayList<>();
 
-    public ContractDTO(Contract contract) {
+    public ContractDTO(Contract contract, Set<ContractAttachmentData> attachmentData) {
         this.setContractNo(contract.getContractNo());
         this.setAcceptedAt(contract.getAcceptedAt());
         this.setRejectedAt(contract.getRejectedAt());
@@ -42,8 +44,9 @@ public class ContractDTO {
         this.setStatus(contract.getStatus());
         this.setPartnerName(contract.getPartnerName());
         this.setSubject(contract.getSubject());
-        for (ContractAttachment attachment : contract.getAttachments()) {
-            attachments.add(new ContractAttachmentDTO(attachment));
+        for (ContractAttachmentData contractAttachmentData : attachmentData) {
+            ContractAttachment attachment = contract.findContractAttachment(contractAttachmentData.getAttachmentId());
+            this.attachments.add(new ContractAttachmentDTO(attachment, contractAttachmentData));
         }
         this.setId(contract.getId());
     }

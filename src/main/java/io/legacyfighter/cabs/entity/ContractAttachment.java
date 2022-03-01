@@ -12,12 +12,7 @@ public class ContractAttachment extends BaseEntity {
         PROPOSED, ACCEPTED_BY_ONE_SIDE, ACCEPTED_BY_BOTH_SIDES, REJECTED
     }
 
-    public ContractAttachment() {
-    }
-
-    @Lob
-    @Column(name = "data", columnDefinition="BLOB")
-    private byte[] data;
+    ContractAttachment() {}
 
     @Column(nullable = false)
     private Instant creationDate = Instant.now();
@@ -34,14 +29,13 @@ public class ContractAttachment extends BaseEntity {
     @ManyToOne
     private Contract contract;
 
-    ContractAttachment(byte[] data, Contract contract, Status status) {
-        this.data = data;
+    ContractAttachment(Contract contract, Status status) {
         this.contract = contract;
         this.status = status;
     }
 
-    static ContractAttachment proposed(byte[] data, Contract contract) {
-        return new ContractAttachment(data, contract, Status.PROPOSED);
+    static ContractAttachment proposed(Contract contract) {
+        return new ContractAttachment(contract, Status.PROPOSED);
     }
 
     public void reject() {
@@ -54,10 +48,6 @@ public class ContractAttachment extends BaseEntity {
         } else {
             status = ContractAttachment.Status.ACCEPTED_BY_ONE_SIDE;
         }
-    }
-
-    public byte[] getData() {
-        return data;
     }
 
     public Instant getCreationDate() {

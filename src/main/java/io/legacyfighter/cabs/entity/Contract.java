@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 public class Contract extends BaseEntity {
@@ -15,8 +16,7 @@ public class Contract extends BaseEntity {
         NEGOTIATIONS_IN_PROGRESS, REJECTED, ACCEPTED
     }
 
-    public Contract() {
-    }
+    Contract() {}
 
     @OneToMany(mappedBy = "contract")
     private Set<ContractAttachment> attachments = new HashSet<>();
@@ -65,10 +65,27 @@ public class Contract extends BaseEntity {
         status = Status.REJECTED;
     }
 
-    public ContractAttachment proposeAttachment(byte[] data) {
-        ContractAttachment contractAttachment = ContractAttachment.proposed(data, this);
+    public void acceptAttachment(Long attachmentId) {
+        ContractAttachment contractAttachment = findContractAttachment(attachmentId);
+        contractAttachment.accept();
+    }
+
+    public void rejectAttachment(Long attachmentId) {
+        ContractAttachment contractAttachment = findContractAttachment(attachmentId);
+        contractAttachment.reject();
+    }
+
+    public ContractAttachment proposeAttachment() {
+        ContractAttachment contractAttachment = ContractAttachment.proposed(this);
         this.attachments.add(contractAttachment);
         return contractAttachment;
+    }
+
+    public ContractAttachment findContractAttachment(Long attachmentId) {
+        return attachments.stream()
+                .filter(attachment -> attachment.getId().equals(attachmentId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Attachment not found"));
     }
 
     public Instant getCreationDate() {
@@ -97,6 +114,10 @@ public class Contract extends BaseEntity {
 
     public Set<ContractAttachment> getAttachments() {
         return Collections.unmodifiableSet(attachments);
+    }
+
+    public Set<Long> getAttachmentIds() {
+        return attachments.stream().map(ContractAttachment::getId).collect(Collectors.toSet());
     }
 
     public String getPartnerName() {
