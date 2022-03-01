@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 @Entity
 public class Contract extends BaseEntity {
 
+
     public enum Status {
         NEGOTIATIONS_IN_PROGRESS, REJECTED, ACCEPTED
     }
@@ -86,6 +87,10 @@ public class Contract extends BaseEntity {
                 .filter(attachment -> attachment.getId().equals(attachmentId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Attachment not found"));
+    }
+
+    public void removeAttachment(Long attachmentId) {
+        attachments.removeIf(attachment -> attachment.getId().equals(attachmentId));
     }
 
     public Instant getCreationDate() {

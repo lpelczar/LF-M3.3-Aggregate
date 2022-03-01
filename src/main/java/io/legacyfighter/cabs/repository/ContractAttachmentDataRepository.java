@@ -9,4 +9,5 @@ public interface ContractAttachmentDataRepository extends JpaRepository<Contract
 
     Set<ContractAttachmentData> findByAttachmentIdIn(Set<Long> attachmentIds);
 
+    void deleteByAttachmentId(Long attachmentId);
 }

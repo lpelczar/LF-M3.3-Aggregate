@@ -84,7 +84,9 @@ public class ContractService {
 
     @Transactional
     public void removeAttachment(Long contractId, Long attachmentId) {
-        //TODO sprawdzenie czy nalezy do kontraktu (JIRA: II-14455)
-        contractAttachmentRepository.deleteById(attachmentId);
+        Contract contract = find(contractId);
+        ContractAttachment contractAttachment = contract.findContractAttachment(attachmentId);
+        contract.removeAttachment(contractAttachment.getId());
+        contractAttachmentDataRepository.deleteByAttachmentId(attachmentId);
     }
 }
