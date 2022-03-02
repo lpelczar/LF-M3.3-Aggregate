@@ -1,6 +1,8 @@
 package io.legacyfighter.cabs.entity;
 
 import io.legacyfighter.cabs.common.BaseEntity;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -20,6 +22,7 @@ public class Contract extends BaseEntity {
     Contract() {}
 
     @OneToMany(mappedBy = "contract")
+    @Fetch(value = FetchMode.JOIN)
     private Set<ContractAttachment> attachments = new HashSet<>();
 
     private String partnerName;
