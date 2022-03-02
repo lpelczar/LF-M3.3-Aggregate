@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity
@@ -21,7 +22,7 @@ public class Contract extends BaseEntity {
 
     Contract() {}
 
-    @OneToMany(mappedBy = "contract")
+    @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL)
     @Fetch(value = FetchMode.JOIN)
     private Set<ContractAttachment> attachments = new HashSet<>();
 
@@ -69,13 +70,13 @@ public class Contract extends BaseEntity {
         status = Status.REJECTED;
     }
 
-    public void acceptAttachment(Long attachmentId) {
-        ContractAttachment contractAttachment = findContractAttachment(attachmentId);
+    public void acceptAttachment(UUID attachmentNo) {
+        ContractAttachment contractAttachment = findAttachment(attachmentNo);
         contractAttachment.accept();
     }
 
-    public void rejectAttachment(Long attachmentId) {
-        ContractAttachment contractAttachment = findContractAttachment(attachmentId);
+    public void rejectAttachment(UUID attachmentNo) {
+        ContractAttachment contractAttachment = findAttachment(attachmentNo);
         contractAttachment.reject();
     }
 
@@ -85,15 +86,15 @@ public class Contract extends BaseEntity {
         return contractAttachment;
     }
 
-    public ContractAttachment findContractAttachment(Long attachmentId) {
+    public ContractAttachment findAttachment(UUID attachmentNo) {
         return attachments.stream()
-                .filter(attachment -> attachment.getId().equals(attachmentId))
+                .filter(attachment -> attachment.getAttachmentNo().equals(attachmentNo))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Attachment not found"));
     }
 
-    public void removeAttachment(Long attachmentId) {
-        attachments.removeIf(attachment -> attachment.getId().equals(attachmentId));
+    public void removeAttachment(UUID attachmentNo) {
+        attachments.removeIf(attachment -> attachment.getAttachmentNo().equals(attachmentNo));
     }
 
     public Instant getCreationDate() {
@@ -124,8 +125,8 @@ public class Contract extends BaseEntity {
         return Collections.unmodifiableSet(attachments);
     }
 
-    public Set<Long> getAttachmentIds() {
-        return attachments.stream().map(ContractAttachment::getId).collect(Collectors.toSet());
+    public Set<UUID> getAttachmentNos() {
+        return attachments.stream().map(ContractAttachment::getAttachmentNo).collect(Collectors.toSet());
     }
 
     public String getPartnerName() {

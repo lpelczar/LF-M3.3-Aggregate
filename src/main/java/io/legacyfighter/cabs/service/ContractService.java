@@ -3,25 +3,21 @@ package io.legacyfighter.cabs.service;
 import io.legacyfighter.cabs.dto.ContractAttachmentDTO;
 import io.legacyfighter.cabs.dto.ContractDTO;
 import io.legacyfighter.cabs.entity.Contract;
-import io.legacyfighter.cabs.entity.ContractAttachment;
 import io.legacyfighter.cabs.entity.ContractAttachmentData;
 import io.legacyfighter.cabs.repository.ContractAttachmentDataRepository;
-import io.legacyfighter.cabs.repository.ContractAttachmentRepository;
 import io.legacyfighter.cabs.repository.ContractRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class ContractService {
 
     @Autowired
     private ContractRepository contractRepository;
-
-    @Autowired
-    private ContractAttachmentRepository contractAttachmentRepository;
 
     @Autowired
     private ContractAttachmentDataRepository contractAttachmentDataRepository;
@@ -49,13 +45,15 @@ public class ContractService {
     @Transactional
     public void rejectAttachment(Long attachmentId) {
         Contract contract = contractRepository.findByAttachmentId(attachmentId);
-        contract.rejectAttachment(attachmentId);
+        UUID attachmentNo = contractRepository.findAttachmentNoById(attachmentId);
+        contract.rejectAttachment(attachmentNo);
     }
 
     @Transactional
     public void acceptAttachment(Long attachmentId) {
         Contract contract = contractRepository.findByAttachmentId(attachmentId);
-        contract.acceptAttachment(attachmentId);
+        UUID attachmentNo = contractRepository.findAttachmentNoById(attachmentId);
+        contract.acceptAttachment(attachmentNo);
     }
 
     @Transactional
@@ -70,23 +68,24 @@ public class ContractService {
     @Transactional
     public ContractDTO findDto(Long id) {
         Contract contract = find(id);
-        Set<ContractAttachmentData> attachmentData = contractAttachmentDataRepository.findByAttachmentIdIn(contract.getAttachmentIds());
+        Set<ContractAttachmentData> attachmentData = contractAttachmentDataRepository.findByAttachmentNoIn(contract.getAttachmentNos());
         return new ContractDTO(contract, attachmentData);
     }
 
     @Transactional
     public ContractAttachmentDTO proposeAttachment(Long contractId, ContractAttachmentDTO contractAttachmentDTO) {
         Contract contract = find(contractId);
-        ContractAttachment contractAttachment = contractAttachmentRepository.save(contract.proposeAttachment());
-        ContractAttachmentData contractAttachmentData = ContractAttachmentData.from(contractAttachment.getId(), contractAttachmentDTO.getData());
-        return new ContractAttachmentDTO(contractAttachment, contractAttachmentDataRepository.save(contractAttachmentData));
+        UUID attachmentId = contract.proposeAttachment().getAttachmentNo();
+        ContractAttachmentData contractAttachmentData = ContractAttachmentData.from(attachmentId, contractAttachmentDTO.getData());
+        Contract saved = contractRepository.save(contract);
+        return new ContractAttachmentDTO(saved.findAttachment(attachmentId), contractAttachmentDataRepository.save(contractAttachmentData));
     }
 
     @Transactional
     public void removeAttachment(Long contractId, Long attachmentId) {
         Contract contract = find(contractId);
-        ContractAttachment contractAttachment = contract.findContractAttachment(attachmentId);
-        contract.removeAttachment(contractAttachment.getId());
-        contractAttachmentDataRepository.deleteByAttachmentId(attachmentId);
+        UUID attachmentNo = contractRepository.findAttachmentNoById(attachmentId);
+        contract.removeAttachment(attachmentNo);
+        contractAttachmentDataRepository.deleteByAttachmentNo(attachmentNo);
     }
 }

@@ -31,7 +31,7 @@ public class ContractAttachmentDTO {
         this.id = attachment.getId();
         this.data = contractAttachmentData.getData();
         this.contractId = attachment.getContract().getId();
-        this.creationDate = attachment.getCreationDate();
+        this.creationDate = contractAttachmentData.getCreationDate();
         this.rejectedAt = attachment.getRejectedAt();
         this.acceptedAt = attachment.getAcceptedAt();
         this.changeDate = attachment.getChangeDate();

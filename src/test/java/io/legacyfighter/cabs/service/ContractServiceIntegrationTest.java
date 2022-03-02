@@ -4,7 +4,6 @@ import io.legacyfighter.cabs.dto.ContractAttachmentDTO;
 import io.legacyfighter.cabs.dto.ContractDTO;
 import io.legacyfighter.cabs.entity.Contract;
 import io.legacyfighter.cabs.entity.ContractAttachment;
-import io.legacyfighter.cabs.repository.ContractAttachmentRepository;
 import io.legacyfighter.cabs.repository.ContractRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,14 +22,10 @@ class ContractServiceIntegrationTest {
     private ContractRepository contractRepository;
 
     @Autowired
-    private ContractAttachmentRepository contractAttachmentRepository;
-
-    @Autowired
     ContractService contractService;
 
     @BeforeEach
     void setup() {
-        contractAttachmentRepository.deleteAll();
         contractRepository.deleteAll();
     }
 

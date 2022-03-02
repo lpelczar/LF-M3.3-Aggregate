@@ -45,7 +45,7 @@ public class ContractDTO {
         this.setPartnerName(contract.getPartnerName());
         this.setSubject(contract.getSubject());
         for (ContractAttachmentData contractAttachmentData : attachmentData) {
-            ContractAttachment attachment = contract.findContractAttachment(contractAttachmentData.getAttachmentId());
+            ContractAttachment attachment = contract.findAttachment(contractAttachmentData.getAttachmentNo());
             this.attachments.add(new ContractAttachmentDTO(attachment, contractAttachmentData));
         }
         this.setId(contract.getId());

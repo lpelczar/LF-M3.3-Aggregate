@@ -4,6 +4,7 @@ import io.legacyfighter.cabs.common.BaseEntity;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 public class ContractAttachment extends BaseEntity {
@@ -15,7 +16,7 @@ public class ContractAttachment extends BaseEntity {
     ContractAttachment() {}
 
     @Column(nullable = false)
-    private Instant creationDate = Instant.now();
+    private UUID attachmentNo = UUID.randomUUID();
 
     private Instant acceptedAt;
 
@@ -50,10 +51,6 @@ public class ContractAttachment extends BaseEntity {
         }
     }
 
-    public Instant getCreationDate() {
-        return creationDate;
-    }
-
     public Instant getAcceptedAt() {
         return acceptedAt;
     }
@@ -72,6 +69,10 @@ public class ContractAttachment extends BaseEntity {
 
     public Contract getContract() {
         return contract;
+    }
+
+    public UUID getAttachmentNo() {
+        return attachmentNo;
     }
 
     @Override
